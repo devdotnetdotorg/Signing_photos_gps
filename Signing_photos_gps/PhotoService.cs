@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Windows.Media.Imaging;
 using System.Globalization;
@@ -13,11 +10,19 @@ using SharpKml.Base;
 
 namespace Signing_photos_gps
 {
+    /// <summary>
+    /// Подписывание фотографий координатами GPS
+    /// </summary>
     class PhotoService
     {
-        public varforbw Params;//Параметры работы с фото, перезапись, добавление времени
-        //
-        private List<PointGPS> Track;//GPS трек
+        /// <summary>
+        /// Параметры работы с фото, перезапись, добавление времени
+        /// </summary>
+        public varforbw Params;
+        /// <summary>
+        /// GPS трек
+        /// </summary>
+        private List<PointGPS> Track;
         public PhotoService()
         {
             Params = new varforbw();
@@ -59,6 +64,12 @@ namespace Signing_photos_gps
             //Collect
             //GC.Collect();
         }
+        /// <summary>
+        /// Разбор XML документа с координатами GPS. И формирование из него
+        /// списка List. Входной параметр XmlDocument <paramref name="xDoc"/>
+        /// XML документ с координатами GPS.
+        /// </summary>
+        /// <param name="xDoc"> документ с координатами GPS.</param>
         private void parsingKML(XmlDocument xDoc)
         {
             //Выбрка XPath
@@ -115,16 +126,21 @@ namespace Signing_photos_gps
             //GC.Collect();
         }
         /// <summary>
-        /// Подпись фотографии координатами GPS.
+        /// XZ
         /// </summary>
         public string WriteGPSinImage_PresentationCore(string PathImage)
         {
             PointGPS out_point;
             return this.WriteGPSinImage_PresentationCore(PathImage, out out_point);
         }
-        // <summary>
+        /// <summary>
         /// Подпись фотографии координатами GPS.
         /// </summary>
+        /// <returns>
+        /// Результат операции. ОК или невозможно подписать.
+        /// </returns>
+        ///<param name="PathImage">Путь на диске к фотографии.</param>
+        /// <param name="out_point">Рассчитанные координаты фотографии.</param>
         public string WriteGPSinImage_PresentationCore(string PathImage, out PointGPS out_point)
         {
             out_point = null;
@@ -204,8 +220,10 @@ namespace Signing_photos_gps
             return (BitmapMetadata)decoder.Frames[0].Metadata.Clone(); //считали и сохранили метаданные
         }
         /// <summary>
-        /// Изменение EXIF информации фото для записи
+        /// Изменение EXIF информации фотограйии для записи
         /// </summary>
+        ///<param name="new_point">Координаты фотографии.</param>
+        ///<param name="TmpImgEXIF">Ссылка на теги EXIF.</param>
         private void EditEXIF(PointGPS new_point, ref BitmapMetadata TmpImgEXIF)
         {
             //Запись в EXIF
@@ -248,6 +266,9 @@ namespace Signing_photos_gps
         /// <summary>
         /// Поиск двух ближайших точек
         /// </summary>
+        ///<param name="DateOfShot">Дата фотографии.</param>
+        ///<param name="point_A">Координаты точки A.</param>
+        ///<param name="point_B">Координаты точки B.</param>
         private void FindPointsAB(DateTime DateOfShot, ref PointGPS point_A, ref PointGPS point_B)
         {
                 //Поиск двух точек внутри Трека
@@ -277,11 +298,17 @@ namespace Signing_photos_gps
                 }
                 //
         }
-        // <summary>
+        /// <summary>
         /// Расчет точки положения. Исходя из линейной скорости вычисление местоположения
         /// Расчитывается скорость по x и y, затем прибавляется дельта к 
         /// начальной точки A, получаем ответ
         /// </summary>
+        /// <returns>
+        /// Расчетные координаты фотографии.
+        /// </returns>
+        ///<param name="DateOfShot">Дата фотографии.</param>
+        ///<param name="point_A">Координаты точки A.</param>
+        ///<param name="point_B">Координаты точки B.</param>
         private PointGPS PositionCalculation(DateTime DateOfShot, PointGPS point_A, PointGPS point_B)
         { 
             double track_y = point_B.latitude - point_A.latitude;
@@ -312,10 +339,10 @@ namespace Signing_photos_gps
             return new_point;
         }
 
-            /// <summary>
-            /// Перевод типа double в Rational
-            /// Для Высота на уровнем моря
-            /// </summary>
+        /// <summary>
+        /// Перевод типа double в Rational
+        /// Для Высота на уровнем моря
+        /// </summary>
         private ulong Rational(double a)
         {
             uint denom = 1000;
@@ -335,8 +362,9 @@ namespace Signing_photos_gps
             Second = (((value - Math.Floor(value)) * 60.0) - Math.Floor(((value - Math.Floor(value)) * 60.0))) * 60;
         }
         /// <summary>
-        /// Создание KML файла по фоотографиям
+        /// Создание KML файла по фотографиям
         /// </summary>
+        // TODO: доделать создание файла KML по координатам фотографий
         public string CreateKML(List<KeyValuePair<string, PointGPS>> listPointsWithPhoto)
         {
             Console.WriteLine("Creating a point at 37.42052549 latitude and -122.0816695 longitude.\n");
@@ -372,7 +400,11 @@ namespace Signing_photos_gps
             return "ok";
         }
     }
-    //
+    /// <summary>
+    /// Параметры подписывание фотографий: путь на диске к фотографиям, путь к файлу GPS,
+    /// принудительная перезапись координат в файле даже если они уже есть,
+    /// добавить или убавить время для коррекции
+    /// </summary>
     struct varforbw
     {
         public string pathImages;
@@ -381,7 +413,9 @@ namespace Signing_photos_gps
         public bool addOrRemoveTime;
         public System.TimeSpan addTime;
     }
-
+    /// <summary>
+    /// Координаты широта, долгота, высота, время
+    /// </summary>
     public class PointGPS
     {
         public double latitude;

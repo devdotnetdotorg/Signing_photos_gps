@@ -1,23 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Drawing.Printing;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using UI.FolderSelect;
-using Signing_photos_gps;
 using System.IO.IsolatedStorage;
 using System.IO;
-using System.Threading;
 using Microsoft.WindowsAPICodePack.Taskbar;
-using SharpKml.Base;
-using SharpKml.Dom;
-using SharpKml.Engine;
 
 namespace Signing_photos_gps
 {
@@ -27,17 +16,23 @@ namespace Signing_photos_gps
         //2 Формирование KML
         //3 Новый движек
         //4 Исключения основного потока
-        
+
         //Global
+        ///  <summary>Фоновый процесс для обработки фотографий </summary>
         static BackgroundWorker bw=null;
-        string settingtxtPathFolder=null, settingtxtPathGpsFile=null;
-        //
+        ///  <summary>Путь к папке с фотографиями</summary>
+        string settingtxtPathFolder = null;
+        ///  <summary>Путь к файлу GPS</summary>
+        string settingtxtPathGpsFile=null; // 
+        ///  <summary>Объект для доступа к панели задач Windows</summary>
         TaskbarManager prog = Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance;
         public frmMain()
         {
             InitializeComponent();
         }
-
+        /// <summary>
+        /// Выбор папки с фотографиями
+        /// </summary>
         private void btnSelectFolder_Click(object sender, EventArgs e)
         {
             var fsd = new FolderSelectDialog();
@@ -56,7 +51,9 @@ namespace Signing_photos_gps
                 txtPathFolder.Text=fsd.FileName;
             }
         }
-
+        /// <summary>
+        /// Запуск фонового потока для обработки фотографий
+        /// </summary>
         private void btnRun_Click(object sender, EventArgs e)
         {
             //Training
@@ -102,6 +99,9 @@ namespace Signing_photos_gps
             bw.RunWorkerAsync(varforbw1);
         }
 
+        /// <summary>
+        /// Фоновый поток
+        /// </summary>
         static void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker bw_local = sender as BackgroundWorker;
@@ -188,6 +188,9 @@ namespace Signing_photos_gps
             }*/
     
         }
+        /// <summary>
+        /// Изменение прогресса выполнения задачи
+        /// </summary>
         private void bw_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
                 prog.SetProgressValue(e.ProgressPercentage, 100);
@@ -196,7 +199,9 @@ namespace Signing_photos_gps
                      richtbLog.AppendText(e.UserState.ToString() + "\n");
                   }
         }
-
+        /// <summary>
+        /// Завершение выполнения задачи подписи фотографий
+        /// </summary>
         private void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             richtbLog.AppendText("====================" + "\n");
@@ -221,6 +226,9 @@ namespace Signing_photos_gps
             //
             btnRun.Text = "Запустить";
         }
+        /// <summary>
+        /// Выбор файла KML с GPS координатами 
+        /// </summary>
         private void btnSelectFileGps_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialogGPS = new OpenFileDialog();
@@ -242,7 +250,9 @@ namespace Signing_photos_gps
             // получаем выбранный файл
             txtPathGpsFile.Text = openFileDialogGPS.FileName;
         }
-
+        /// <summary>
+        /// Update UI 
+        /// </summary>
         private void txtPathFolder_TextChanged(object sender, EventArgs e)
         {
             if((txtPathFolder.Text.Length>0)&&(txtPathGpsFile.Text.Length > 0))
@@ -253,7 +263,9 @@ namespace Signing_photos_gps
                  {
             }
         }
-
+        /// <summary>
+        /// Update UI 
+        /// </summary>
         private void txtPathGpsFile_TextChanged(object sender, EventArgs e)
         {
             if ((txtPathFolder.Text != "") || (txtPathGpsFile.Text != ""))
@@ -265,6 +277,9 @@ namespace Signing_photos_gps
             {
             }
         }
+        /// <summary>
+        /// Сохранение настроек программы
+        /// </summary>
         private void WriteUserData()
         {
             if ((txtPathFolder.Text.Length > 0) && (txtPathGpsFile.Text.Length > 0))
@@ -285,6 +300,9 @@ namespace Signing_photos_gps
                 userDataFile.Close();
             }
         }
+        /// <summary>
+        /// Чтение настроек программы
+        /// </summary>
         private void ReadUserData()
         {
             // create an isolated storage stream...
@@ -300,12 +318,16 @@ namespace Signing_photos_gps
                 readStream.Close();
                 userDataFile.Close();
         }
-
+        /// <summary>
+        /// Закрытие главного окна
+        /// </summary>
         private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
         {
             WriteUserData();
         }
-
+        /// <summary>
+        /// Update UI 
+        /// </summary>
         private void richtbLog_TextChanged(object sender, EventArgs e)
         {
             RichTextBox rtx = (RichTextBox)sender;
@@ -313,8 +335,10 @@ namespace Signing_photos_gps
             rtx.SelectionStart = rtx.Text.Length;
             // scroll it automatically
             rtx.ScrollToCaret();
-        }    
-
+        }
+        /// <summary>
+        /// Загрузка главного окна
+        /// </summary>
         private void frmMain_Load(object sender, EventArgs e)
         {
             //read config

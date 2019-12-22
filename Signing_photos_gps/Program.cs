@@ -20,12 +20,11 @@ namespace Signing_photos_gps
             if (System.Environment.OSVersion.Version < new Version(6, 1))
             {
                 MessageBox.Show("Ваша версия операционной системы не поддерживается,\n" +
-               "требуется версия не ниже Windows 7.",
-      "Ошибка",
-      MessageBoxButtons.OK,
-      MessageBoxIcon.Error,
-      MessageBoxDefaultButton.Button1);
-
+                    "требуется версия не ниже Windows 7.",
+                    "Ошибка",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error,
+                    MessageBoxDefaultButton.Button1);
                 return;
             }
             //

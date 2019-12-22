@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("DevDotNet.ORG")]
 [assembly: AssemblyProduct("Signing_photos_gps")]
-[assembly: AssemblyCopyright("Copyright DevDotNet.ORG ©  2018")]
+[assembly: AssemblyCopyright("Copyright DevDotNet.ORG ©  2018 Anton Serdyukov")]
 [assembly: AssemblyTrademark("DevDotNet.ORG")]
 [assembly: AssemblyCulture("")]
 
